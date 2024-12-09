@@ -68,6 +68,31 @@ public class CalculateSales {
 			// 一行ずつ読み込む
 			while((line = br.readLine()) != null) {
 				// ※ここの読み込み処理を変更してください。(処理内容1-2)
+
+//				カンマで区切って配列に格納
+				String[] items = line.split(",");
+
+
+
+//				2つのMapに追加する情報をputの引数として指定
+				branchNames.put("001", "札幌支店");
+				branchSales.put("001", 0L);
+
+				branchNames.put("002", "仙台支店");
+				branchSales.put("002", 0L);
+
+				branchNames.put("003", "東京支店");
+				branchSales.put("003", 0L);
+
+				branchNames.put("004", "名古屋支店");
+				branchSales.put("004", 0L);
+
+				branchNames.put("005", "大阪支店");
+				branchSales.put("005", 0L);
+
+
+
+				System.out.println(branchNames);
 				System.out.println(line);
 			}
 
