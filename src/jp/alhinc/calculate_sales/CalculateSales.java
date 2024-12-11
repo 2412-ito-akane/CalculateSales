@@ -223,6 +223,7 @@ public class CalculateSales {
 			File file = new File(path,fileName);
 			//filewriterとbufferedwriterに引数を渡していき、writeメソッドを使えるようにする
 			FileWriter fw = new FileWriter(file);
+			//bwはすでに宣言しているので、「Bufferedwrite bw」からはじめる必要ない。再宣言しているように勘違いしてしまうため。
 			bw = new BufferedWriter(fw);
 
 			//拡張for文：キーの数だけwriteメソッドを繰り返す
