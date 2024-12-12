@@ -49,10 +49,10 @@ public class CalculateSales {
 		ArrayList<File> rcdFiles = new ArrayList<>();
 
 		//全てのファイル名(拡張子含む)を取得する
-		for(int i=0;i < files.length;i++) {
+		for(int i = 0 ; i < files.length ; i++) {
 
 			//ファイル名の判定をしたい
-			if((files[i].getName()).matches("^[0-9]{8}.rcd$")) {
+			if(files[i].getName().matches("^[0-9]{8}.rcd$")) {
 
 				//trueの時、Listに追加
 				rcdFiles.add(files[i]);
@@ -63,25 +63,23 @@ public class CalculateSales {
 		//rcdFilesの要素の分だけ読込を繰り返す
 		//売上ファイルの読込
 		BufferedReader br = null;
-		for (int i=0; i < rcdFiles.size();i++) {
-
+		for (int i = 0 ; i < rcdFiles.size(); i++) {
 
 			//rcdFilesのListから１つ取り出して変数に代入する
 			File rcdFile = rcdFiles.get(i);
 			//2行ごとにListに格納させるためのリストを作りたい
 			ArrayList<String> array = new ArrayList<>();
 
-
 			//try-catchを使う必要
 			try{
-				File file = new File(args[0],rcdFile.getName());
+				File file = new File(args[0], rcdFile.getName());
 				FileReader fr = new FileReader(file);
 				br = new BufferedReader(fr);
 
 				//1行ずつ読込む
 				String line;
 				//次の行がなくなるまで読込
-				while((line = br.readLine())!=null) {
+				while((line = br.readLine())!= null) {
 					//読込んだ分をリストに加える
 					array.add(line);
 				}
@@ -93,15 +91,10 @@ public class CalculateSales {
 
 				//取り出した売上金額fileSaleをbranchSalesのvalueと加算させる
 				//計算結果はsaleAmountとする
-				long saleAmount =fileSale + branchSales.get(mapKey);
-				System.out.println(saleAmount);
-
+				long saleAmount = fileSale + branchSales.get(mapKey);
 
 				//計算結果saleAmountをbranchSalesに上書きしたい
 				branchSales.put(mapKey, saleAmount);
-
-
-
 			}catch(IOException e) {
 				System.out.println(UNKNOWN_ERROR);
 				return;
@@ -119,13 +112,6 @@ public class CalculateSales {
 			}
 
 		}
-
-
-
-
-
-
-
 
 		// 支店別集計ファイル書き込み処理
 		if(!writeFile(args[0], FILE_NAME_BRANCH_OUT, branchNames, branchSales)) {
@@ -161,27 +147,16 @@ public class CalculateSales {
 				//カンマで区切って配列に格納
 				String[] items = line.split(",");
 
-				//配列に格納されているか確認
-				for (int i =0;i<items.length; i++) {
-					System.out.println(i+":"+items[i]);
-				}
-
 				//支店が増えても自動で対応できるようにする
 				//配列に格納されている[0]を、putメソッドの引数として使いたい
-				int i = 0;
-				while  (i<items.length) {
+				for (int i = 0 ; i < items.length ; i++) {
 					//格納した要素の[0]と[1]を支店コードと支店名を保持するマップへ
-					branchNames.put(items[0], items[1]);
+					branchNames.put(items[0] , items[1]);
 
 					//格納した要素の[0]を支店コードと売上額を保持するマップへ
-					branchSales.put(items[0], 0L);
-					i++;
+					branchSales.put(items[0] , 0L);
 				}
 
-
-
-//				System.out.println(branchNames);
-//				System.out.println(line);
 			}
 
 		} catch(IOException e) {
@@ -239,8 +214,6 @@ public class CalculateSales {
 				bw.newLine();
 
 			}
-
-
 		}catch(IOException e) {
 			System.out.println(UNKNOWN_ERROR);
 			return false;
@@ -256,8 +229,6 @@ public class CalculateSales {
 				}
 			}
 		}
-
-
 		return true;
 	}
 
