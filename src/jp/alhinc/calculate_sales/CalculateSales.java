@@ -49,7 +49,7 @@ public class CalculateSales {
 		ArrayList<File> rcdFiles = new ArrayList<>();
 
 		//全てのファイル名(拡張子含む)を取得する
-		for(int i = 0 ; i < files.length ; i++) {
+		for(int i = 0; i < files.length; i++) {
 
 			//ファイル名の判定をしたい
 			if(files[i].getName().matches("^[0-9]{8}.rcd$")) {
@@ -63,17 +63,14 @@ public class CalculateSales {
 		//rcdFilesの要素の分だけ読込を繰り返す
 		//売上ファイルの読込
 		BufferedReader br = null;
-		for (int i = 0 ; i < rcdFiles.size(); i++) {
+		for(int i = 0; i < rcdFiles.size(); i++) {
 
-			//rcdFilesのListから１つ取り出して変数に代入する
-			File rcdFile = rcdFiles.get(i);
 			//2行ごとにListに格納させるためのリストを作りたい
-			ArrayList<String> array = new ArrayList<>();
+			ArrayList<String> saleList = new ArrayList<>();
 
 			//try-catchを使う必要
-			try{
-				File file = new File(args[0], rcdFile.getName());
-				FileReader fr = new FileReader(file);
+			try {
+				FileReader fr = new FileReader(rcdFiles.get(i));
 				br = new BufferedReader(fr);
 
 				//1行ずつ読込む
@@ -81,21 +78,21 @@ public class CalculateSales {
 				//次の行がなくなるまで読込
 				while((line = br.readLine())!= null) {
 					//読込んだ分をリストに加える
-					array.add(line);
+					saleList.add(line);
 				}
-				//売上array[1]だけ取り出す
+				//売上saleList[1]だけ取り出す
 				//Stringとして格納されているのでlongに変換する
-				long fileSale = Long.parseLong(array.get(1));
+				long fileSale = Long.parseLong(saleList.get(1));
 
-				String mapKey = array.get(0);
+				String branchCode = saleList.get(0);
 
 				//取り出した売上金額fileSaleをbranchSalesのvalueと加算させる
 				//計算結果はsaleAmountとする
-				long saleAmount = fileSale + branchSales.get(mapKey);
+				long saleAmount = fileSale + branchSales.get(branchCode);
 
 				//計算結果saleAmountをbranchSalesに上書きしたい
-				branchSales.put(mapKey, saleAmount);
-			}catch(IOException e) {
+				branchSales.put(branchCode, saleAmount);
+			} catch(IOException e) {
 				System.out.println(UNKNOWN_ERROR);
 				return;
 			} finally {
@@ -149,12 +146,12 @@ public class CalculateSales {
 
 				//支店が増えても自動で対応できるようにする
 				//配列に格納されている[0]を、putメソッドの引数として使いたい
-				for (int i = 0 ; i < items.length ; i++) {
+				for(int i = 0; i < items.length; i++) {
 					//格納した要素の[0]と[1]を支店コードと支店名を保持するマップへ
-					branchNames.put(items[0] , items[1]);
+					branchNames.put(items[0], items[1]);
 
 					//格納した要素の[0]を支店コードと売上額を保持するマップへ
-					branchSales.put(items[0] , 0L);
+					branchSales.put(items[0], 0L);
 				}
 
 			}
@@ -195,7 +192,7 @@ public class CalculateSales {
 		//try-catch文
 		try {
 			//branch.outをFileクラスのインスタンスにする
-			File file = new File(path,fileName);
+			File file = new File(path, fileName);
 			//filewriterとbufferedwriterに引数を渡していき、writeメソッドを使えるようにする
 			FileWriter fw = new FileWriter(file);
 			//bwはすでに宣言しているので、「Bufferedwrite bw」からはじめる必要ない。再宣言しているように勘違いしてしまうため。
@@ -214,7 +211,7 @@ public class CalculateSales {
 				bw.newLine();
 
 			}
-		}catch(IOException e) {
+		} catch(IOException e) {
 			System.out.println(UNKNOWN_ERROR);
 			return false;
 		} finally {
