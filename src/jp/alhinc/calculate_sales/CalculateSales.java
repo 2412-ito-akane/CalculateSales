@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,10 @@ public class CalculateSales {
 	private static final String UNKNOWN_ERROR = "予期せぬエラーが発生しました";
 	private static final String FILE_NOT_EXIST = "支店定義ファイルが存在しません";
 	private static final String FILE_INVALID_FORMAT = "支店定義ファイルのフォーマットが不正です";
+	private static final String RCDFILE_SERIAL_ERROR = "売上ファイル名が連番になっていません";
+	private static final String SALEAMOUNT_DIGIT_ERROR = "合計金額が10桁を超えました";
+	private static final String BRANCHCODE_NONE = "の支店コードが不正です";
+	private static final String SALELIST_SIZE_ERROR = "のフォーマットが不正です";
 
 	/**
 	 * メインメソッド
@@ -35,9 +40,10 @@ public class CalculateSales {
 		Map<String, Long> branchSales = new HashMap<>();
 
 		// 支店定義ファイル読み込み処理
-		if(!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
-			return;
-		}
+			if(!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
+				//falseを受け取るとメインメソッドにreturnを返す
+				return;
+			}
 
 		// ※ここから集計処理を作成してください。(処理内容2-1、2-2)
 
@@ -57,6 +63,23 @@ public class CalculateSales {
 				//trueの時、Listに追加
 				rcdFiles.add(files[i]);
 			}
+		}
+
+		//エラー処理：rcdFilesが連番か確認
+		//rcdFilesを昇順にソートする
+		Collections.sort(rcdFiles);
+		//(rcdFiles－1)回繰り返す
+		for(int i = 0; i < rcdFiles.size() - 1; i++) {
+			//ファイル名の頭8文字を切り取ってintにする
+				int former = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
+				int latter = Integer.parseInt(rcdFiles.get(i+1).getName().substring(0, 8));
+
+				//差が1になるか確認
+				if((latter - former) != 1) {
+					//エラーメッセージ表示
+					System.out.println(RCDFILE_SERIAL_ERROR);
+					return;
+				}
 		}
 
 		//rcdFilesから1個1個のファイルの情報を取得したい
@@ -80,6 +103,21 @@ public class CalculateSales {
 					//読込んだ分をリストに加える
 					saleList.add(line);
 				}
+
+				//エラー処理：売上ファイルのListの要素数が2になっているか
+				if(saleList.size() != 2) {
+					//要素が2ではない時、エラーメッセージをコンソールに表示
+					System.out.println(rcdFiles.get(i).getName() + SALELIST_SIZE_ERROR);
+					return;
+				}
+
+				//エラー処理：売上ファイルの支店コードがbranchNamesにあるか
+				if(!branchNames.containsKey(saleList.get(0))) {
+					//なかった時エラーメッセージをコンソールに表示
+					System.out.println(rcdFiles.get(i).getName() + BRANCHCODE_NONE);
+					return;
+				}
+
 				//売上saleList[1]だけ取り出す
 				//Stringとして格納されているのでlongに変換する
 				long fileSale = Long.parseLong(saleList.get(1));
@@ -90,8 +128,15 @@ public class CalculateSales {
 				//計算結果はsaleAmountとする
 				long saleAmount = fileSale + branchSales.get(branchCode);
 
+				//計算結果が10桁を超えた場合
+				if(saleAmount >= 10000000000L) {
+					System.out.println(SALEAMOUNT_DIGIT_ERROR);
+					return;
+				}
+
 				//計算結果saleAmountをbranchSalesに上書きしたい
 				branchSales.put(branchCode, saleAmount);
+
 			} catch(IOException e) {
 				System.out.println(UNKNOWN_ERROR);
 				return;
@@ -132,6 +177,13 @@ public class CalculateSales {
 
 		try {
 			File file = new File(path, fileName);
+			//エラー処理：ファイルが存在していないとき
+			if(!file.exists()) {
+				//ture：ファイルが存在しないとき、メッセージをコンソールに表示する
+				System.out.println(FILE_NOT_EXIST);
+				//falseをreadFileメソッドに返すことで処理が止まる
+				return false;
+			}
 			FileReader fr = new FileReader(file);
 			br = new BufferedReader(fr);
 
@@ -143,6 +195,16 @@ public class CalculateSales {
 
 				//カンマで区切って配列に格納
 				String[] items = line.split(",");
+
+				//エラー処理：","で区切ることができているか、配列に要素が2つのみか
+				//かつ、支店コード数字3桁が入っているか確認
+				if((items.length != 2) || (!items[0].matches("^[0-9]{3}"))) {
+					//要素が2つではない、支店コードが3桁ではない
+					//メッセージをコンソールに表示
+					System.out.println(FILE_INVALID_FORMAT);
+					//処理を終える
+					return false;
+				}
 
 				//支店が増えても自動で対応できるようにする
 				//配列に格納されている[0]を、putメソッドの引数として使いたい
