@@ -47,10 +47,10 @@ public class CalculateSales {
 		Map<String, Long> branchSales = new HashMap<>();
 
 		// 支店定義ファイル読み込み処理
-			if(!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
-				//falseを受け取るとメインメソッドにreturnを返す
-				return;
-			}
+		if(!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales)) {
+			//falseを受け取るとメインメソッドにreturnを返す
+			return;
+		}
 
 		// ※ここから集計処理を作成してください。(処理内容2-1、2-2)
 
@@ -79,15 +79,15 @@ public class CalculateSales {
 		//(rcdFiles－1)回繰り返す
 		for(int i = 0; i < rcdFiles.size() -1; i++) {
 			//ファイル名の頭8文字を切り取ってintにする
-				int former = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
-				int latter = Integer.parseInt(rcdFiles.get(i+1).getName().substring(0, 8));
+			int former = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
+			int latter = Integer.parseInt(rcdFiles.get(i + 1).getName().substring(0, 8));
 
-				//差が1になるか確認
-				if((latter - former) != 1) {
-					//エラーメッセージ表示
-					System.out.println(RCDFILE_SERIAL_ERROR);
-					return;
-				}
+			//差が1になるか確認
+			if((latter - former) != 1) {
+				//エラーメッセージ表示
+				System.out.println(RCDFILE_SERIAL_ERROR);
+				return;
+			}
 		}
 
 		//rcdFilesから1個1個のファイルの情報を取得したい
@@ -213,7 +213,7 @@ public class CalculateSales {
 
 				//エラー処理：","で区切ることができているか、配列に要素が2つのみか
 				//かつ、支店コード数字3桁が入っているか確認
-				if((items.length != 2) || (!items[0].matches("^[0-9]{3}"))) {
+				if((items.length != 2) || (!items[0].matches("^[0-9]{3}$"))) {
 					//要素が2つではない、支店コードが3桁ではない
 					//メッセージをコンソールに表示
 					System.out.println(FILE_INVALID_FORMAT);
@@ -223,13 +223,11 @@ public class CalculateSales {
 
 				//支店が増えても自動で対応できるようにする
 				//配列に格納されている[0]を、putメソッドの引数として使いたい
-				for(int i = 0; i < items.length; i++) {
-					//格納した要素の[0]と[1]を支店コードと支店名を保持するマップへ
-					branchNames.put(items[0], items[1]);
+				//格納した要素の[0]と[1]を支店コードと支店名を保持するマップへ
+				branchNames.put(items[0], items[1]);
 
-					//格納した要素の[0]を支店コードと売上額を保持するマップへ
-					branchSales.put(items[0], 0L);
-				}
+				//格納した要素の[0]を支店コードと売上額を保持するマップへ
+				branchSales.put(items[0], 0L);
 			}
 		} catch(IOException e) {
 			System.out.println(UNKNOWN_ERROR);
