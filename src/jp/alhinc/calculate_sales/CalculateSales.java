@@ -25,10 +25,8 @@ public class CalculateSales {
 
 	// エラーメッセージ
 	private static final String UNKNOWN_ERROR = "予期せぬエラーが発生しました";
-	private static final String FILE_NOT_EXIST = "支店定義ファイルが存在しません";
-	private static final String COMMODITY_FILE_NOT_EXIST = "商品定義ファイルが存在しません";
-	private static final String FILE_INVALID_FORMAT = "支店定義ファイルのフォーマットが不正です";
-	private static final String COMMODITY_FILE_INVALID_FORMAT = "商品定義ファイルのフォーマットが不正です";
+	private static final String FILE_NOT_EXIST = "定義ファイルが存在しません";
+	private static final String FILE_INVALID_FORMAT = "定義ファイルのフォーマットが不正です";
 	private static final String RCDFILE_SERIAL_ERROR = "売上ファイル名が連番になっていません";
 	private static final String SALEAMOUNT_DIGIT_ERROR = "合計金額が10桁を超えました";
 	private static final String BRANCHCODE_NONE = "の支店コードが不正です";
@@ -62,13 +60,13 @@ public class CalculateSales {
 		Map<String, Long> commoditySales = new HashMap<>();
 
 		// 支店定義ファイル読み込み処理
-		if(!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales, BRANCH_REGULAR_EXPRESSION, FILE_NOT_EXIST, FILE_INVALID_FORMAT)) {
+		if(!readFile(args[0], FILE_NAME_BRANCH_LST, branchNames, branchSales, BRANCH_REGULAR_EXPRESSION, "支店")) {
 			//falseを受け取るとメインメソッドにreturnを返す
 			return;
 		}
 
 		//商品定義ファイル読込
-		if(!readFile(args[0], FILE_NAME_COMMODITY_LIST, commodityNames, commoditySales, COMMODITY_REGULAR_EXPRESSION, COMMODITY_FILE_NOT_EXIST, COMMODITY_FILE_INVALID_FORMAT)) {
+		if(!readFile(args[0], FILE_NAME_COMMODITY_LIST, commodityNames, commoditySales, COMMODITY_REGULAR_EXPRESSION, "商品")) {
 			//falseを受け取るとメインメソッドにreturnを返す
 			return;
 		}
@@ -231,7 +229,7 @@ public class CalculateSales {
 	 * @param 支店コードと売上金額を保持するMap +商品コードと売上金額を保持するMap
 	 * @return 読み込み可否
 	 */
-	private static boolean readFile(String path, String fileName, Map<String, String> mapNames, Map<String, Long> mapSales, String regularExpression, String existError, String invalidFormat) {
+	private static boolean readFile(String path, String fileName, Map<String, String> mapNames, Map<String, Long> mapSales, String regularExpression, String name) {
 		BufferedReader br = null;
 
 		try {
@@ -239,7 +237,7 @@ public class CalculateSales {
 			//エラー処理：ファイルが存在していないとき
 			if(!file.exists()) {
 				//ture：ファイルが存在しないとき、メッセージをコンソールに表示する
-				System.out.println(existError);
+				System.out.println(name + FILE_NOT_EXIST);
 				//falseをreadFileメソッドに返すことで処理が止まる
 				return false;
 			}
@@ -260,7 +258,7 @@ public class CalculateSales {
 				if((items.length != 2) || (!items[0].matches(regularExpression))) {
 					//要素が2つではない、支店コードが3桁ではない
 					//メッセージをコンソールに表示
-					System.out.println(invalidFormat);
+					System.out.println(name + FILE_INVALID_FORMAT);
 					//処理を終える
 					return false;
 				}
