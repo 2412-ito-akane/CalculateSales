@@ -34,6 +34,13 @@ public class CalculateSales {
 	 * @param コマンドライン引数
 	 */
 	public static void main(String[] args) {
+		//エラー処理：コマンドライン引数が設定されているのか
+		if(args.length != 1) {
+			//コマンドライン引数が1つ設定されていない場合
+			System.out.println(UNKNOWN_ERROR);
+			return;
+		}
+
 		// 支店コードと支店名を保持するMap
 		Map<String, String> branchNames = new HashMap<>();
 		// 支店コードと売上金額を保持するMap
@@ -58,8 +65,9 @@ public class CalculateSales {
 		for(int i = 0; i < files.length; i++) {
 
 			//ファイル名の判定をしたい
-			if(files[i].getName().matches("^[0-9]{8}.rcd$")) {
-
+			//getName()メソッドでは[ファイルとディレクトリの名前]を取得する
+			//エラー処理：filesの要素が[ファイル]であることを確認するためisFile()を加える
+			if(files[i].isFile() && files[i].getName().matches("^[0-9]{8}.rcd$")) {
 				//trueの時、Listに追加
 				rcdFiles.add(files[i]);
 			}
@@ -69,7 +77,7 @@ public class CalculateSales {
 		//rcdFilesを昇順にソートする
 		Collections.sort(rcdFiles);
 		//(rcdFiles－1)回繰り返す
-		for(int i = 0; i < rcdFiles.size() - 1; i++) {
+		for(int i = 0; i < rcdFiles.size() -1; i++) {
 			//ファイル名の頭8文字を切り取ってintにする
 				int former = Integer.parseInt(rcdFiles.get(i).getName().substring(0, 8));
 				int latter = Integer.parseInt(rcdFiles.get(i+1).getName().substring(0, 8));
@@ -118,17 +126,25 @@ public class CalculateSales {
 					return;
 				}
 
+				//エラー処理：売上金額が数字か確認
+				if(!saleList.get(1).matches("^[0-9]+$")) {
+					//数字ではないとき、エラーメッセージをコンソールに表示
+					System.out.println(UNKNOWN_ERROR);
+					return;
+				}
+
 				//売上saleList[1]だけ取り出す
 				//Stringとして格納されているのでlongに変換する
 				long fileSale = Long.parseLong(saleList.get(1));
 
+				//saleList[0]は支店コード→branchCodeとして扱う
 				String branchCode = saleList.get(0);
 
 				//取り出した売上金額fileSaleをbranchSalesのvalueと加算させる
 				//計算結果はsaleAmountとする
 				long saleAmount = fileSale + branchSales.get(branchCode);
 
-				//計算結果が10桁を超えた場合
+				//エラー処理：計算結果が10桁を超えた場合
 				if(saleAmount >= 10000000000L) {
 					System.out.println(SALEAMOUNT_DIGIT_ERROR);
 					return;
@@ -152,7 +168,6 @@ public class CalculateSales {
 					}
 				}
 			}
-
 		}
 
 		// 支店別集計ファイル書き込み処理
@@ -215,9 +230,7 @@ public class CalculateSales {
 					//格納した要素の[0]を支店コードと売上額を保持するマップへ
 					branchSales.put(items[0], 0L);
 				}
-
 			}
-
 		} catch(IOException e) {
 			System.out.println(UNKNOWN_ERROR);
 			return false;
